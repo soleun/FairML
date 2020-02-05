@@ -5,7 +5,7 @@ Created on Tue Sep 19 19:42:45 2017
 @author: mahbo
 """
 
-import csv, math, winsound, time, copy, cloudpickle, numpy as np, matplotlib.pyplot as plt, scipy.linalg as la
+import csv, math, time, copy, cloudpickle, numpy as np, matplotlib.pyplot as plt, scipy.linalg as la
 from collections import namedtuple
 from scipy.integrate import trapz
 from scipy.stats.stats import pearsonr
@@ -623,7 +623,7 @@ def pcaPlots(prob, kernels=['Linear'], numPC=2, d=0, mu=1, lams=None, linCon=Tru
         main,side,xthresh,ythresh = prob.plot(svm,perc=1,thresholds=[b],graph=False,split=split)
         kernelDat.append(kern(kernel,x,y,main,side,xthresh,ythresh))
     fig = graphs(prob.test if split else prob.data,prob.testSide if split else prob.sideResp,kernelDat,perc)
-    winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
+    # winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
     return prob.test if split else prob.data, prob.testSide if split else prob.sideResp, B, kernelDat, w, fig
 
 def crossVal(prob, k=1, kernels=['Linear','Gaussian'], numPC=2, KSError=False, d=0, mu=1, normPCA=True, lams=None, linCon=True, covCon=True, dualize=True, outputFlag=True):
@@ -700,7 +700,7 @@ def crossVal(prob, k=1, kernels=['Linear','Gaussian'], numPC=2, KSError=False, d
         print('Average variation explained:',np.round(100*np.mean(varExpList/totVarList),2))
         print('Average deviation explained:',np.round(100*np.mean(np.sqrt(varExpList/totVarList)),2))
         print('Average errors',np.round(np.mean(errList,axis=0),4))
-        winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
+        # winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
     prob.data = dat
     prob.sideResp = srsp
     return errList, varExpList, totVarList, eigList, corrList
@@ -831,9 +831,9 @@ def runAllDatasets() -> None:
         k=5
         lams = np.logspace(-4,4,5)
         #print('#################### ',prob.filename,' ######################')
-        err, varExp, totVar, eig, corr = crossVal(prob, k, normPCA=True, linCon=False, covCon=False, lams=lams,outputFlag=False)
-        err1, varExp1, totVar1, eig1, corr1 = crossVal(prob, k, normPCA=True, d=0, covCon=False, lams=lams,outputFlag=False)
-        err2, varExp2, totVar2, eig2, corr2 = crossVal(prob, k, mu=0.01, dualize=True, normPCA=True, d=0, lams=lams, outputFlag=False)
+        err, varExp, totVar, eig, corr = crossVal(prob, k, normPCA=True, linCon=False, covCon=False, lams=lams,outputFlag=True)
+        err1, varExp1, totVar1, eig1, corr1 = crossVal(prob, k, normPCA=True, d=0, covCon=False, lams=lams,outputFlag=True)
+        err2, varExp2, totVar2, eig2, corr2 = crossVal(prob, k, mu=0.01, dualize=True, normPCA=True, d=0, lams=lams, outputFlag=True)
         #stuff = [err,err1,err2,varExp,varExp1,varExp2,totVar,totVar1,totVar2,eig,eig1,eig2,corr,corr1,corr2]
         #print('perc variance: %s\nperc deviation: %s\nerrors: %s'%\
         #      (round(100*np.mean(varExp/totVar),2),round(100*np.mean(np.sqrt(varExp/totVar)),2),np.round(np.mean(err),2)))
@@ -877,22 +877,23 @@ def pcaViz(prob, rand=False, split=False) -> None:
 
 if __name__ == '__main__':
     global datasets
-    datasets = [('Adult_Income_Data.csv','Adult Income'),     # 0 32561 \cite{Lichman:2013}
-                ('Biodeg_Data.csv','Biodeg'),                  # 1 1055 \cite{mansouri2013quantitative}
-                ('Ecoli_Data.csv','E. Coli'),                  # 2 333 \cite{horton1996probabilistic}
-                ('Energy_Data.csv','Energy'),                  # 3 768 \cite{tsanas2012accurate}
-                ('German_Credit_Data.csv','German Credit'),    # 4 1000 \cite{Lichman:2013}
-                ('Image_Seg_Data.csv','Image'),                # 5 660 \cite{Lichman:2013}
-                ('Letter_Rec_Data.csv','Letter'),              # 6 20000 \cite{frey1991letter}
-                ('Magic_Data.csv','Magic'),                    # 7 19020 \cite{bock2004methods}
-                ('Parkinsons_Data.csv',"Parkinson's"),         # 8 5875 \cite{Lichman:2013}
-                ('Pima_Diabetes_Data.csv','Pima'),             # 9 768 \cite{smith1988using}
-                ('Recidivism_Data.csv','Recidivism'),          # 10 5279 \cite{angwin2016machine}
-                ('SkillCraft_Data.csv','SkillCraft'),          # 11 3339 \cite{thompson2013video}
-                ('Statlog_Data.csv','Statlog'),                # 12 3071 \cite{Lichman:2013}
-                ('Steel_Data.csv','Steel'),                    # 13 1941 \cite{Lichman:2013}
-                ('Taiwanese_Credit_Data.csv','Taiwan Credit'), # 14 29623 \cite{yeh2009comparisons}
-                ('Wine_Quality_Data.csv','Wine Quality')]      # 15 6497 \cite{cortez2009modeling}
+    datasets = [#('Adult_Income_Data.csv','Adult Income'),     # 0 32561 \cite{Lichman:2013}
+                #('Biodeg_Data.csv','Biodeg'),                  # 1 1055 \cite{mansouri2013quantitative}
+                ('Ecoli_Data.csv','E. Coli')#,                  # 2 333 \cite{horton1996probabilistic}
+                #('Energy_Data.csv','Energy'),                  # 3 768 \cite{tsanas2012accurate}
+                #('German_Credit_Data.csv','German Credit'),    # 4 1000 \cite{Lichman:2013}
+                #('Image_Seg_Data.csv','Image'),                # 5 660 \cite{Lichman:2013}
+                #('Letter_Rec_Data.csv','Letter'),              # 6 20000 \cite{frey1991letter}
+                #('Magic_Data.csv','Magic'),                    # 7 19020 \cite{bock2004methods}
+                #('Parkinsons_Data.csv',"Parkinson's"),         # 8 5875 \cite{Lichman:2013}
+                #('Pima_Diabetes_Data.csv','Pima'),             # 9 768 \cite{smith1988using}
+                #('Recidivism_Data.csv','Recidivism'),          # 10 5279 \cite{angwin2016machine}
+                #('SkillCraft_Data.csv','SkillCraft'),          # 11 3339 \cite{thompson2013video}
+                #('Statlog_Data.csv','Statlog'),                # 12 3071 \cite{Lichman:2013}
+                #('Steel_Data.csv','Steel'),                    # 13 1941 \cite{Lichman:2013}
+                #('Taiwanese_Credit_Data.csv','Taiwan Credit'), # 14 29623 \cite{yeh2009comparisons}
+                #('Wine_Quality_Data.csv','Wine Quality')       # 15 6497 \cite{cortez2009modeling}
+                ]      
     
     runAllDatasets()
     

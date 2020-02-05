@@ -9,7 +9,7 @@ Created on Thu Oct 26 18:25:32 2017
 import warnings, copy, numpy as np, scipy.linalg as la
 from gurMod import *
 from mosSVM import *
-from mosSVMSDP import mosSVMSDP
+#from mosSVMSDP import mosSVMSDP
 from mosPCA import *
 from mosPCAMult import *
 #from sklearn.covariance import MinCovDet
@@ -116,10 +116,17 @@ class model():
             else: return 'other'
         else:
             stat = self.m.m.getsolsta(mosek.soltype.itr)
-            if stat in [mosek.solsta.optimal, mosek.solsta.near_optimal]: return 'optimal'
-            elif stat in [mosek.solsta.prim_infeas_cer,mosek.solsta.near_prim_infeas_cer]: return 'infeasible'
-            elif stat in [mosek.solsta.dual_infeas_cer,mosek.solsta.near_dual_infeas_cer]: return 'unbounded'
-            else: return 'other'
+            if (stat == mosek.solsta.optimal): return 'optimal' #https://github.com/cvxgrp/CVXR/issues/49#issuecomment-492350976
+            elif (stat == mosek.solsta.prim_infeas_cer): return 'infeasible'
+            elif (stat == mosek.solsta.dual_infeas_cer): return 'unbounded'
+            elif stat == mosek.solsta.unknown:
+                return 'unknown'
+            else:
+                return 'other'
+            #if stat in [mosek.solsta.optimal, mosek.solsta.near_optimal]: return 'optimal'
+            #elif stat in [mosek.solsta.prim_infeas_cer,mosek.solsta.near_prim_infeas_cer]: return 'infeasible'
+            #elif stat in [mosek.solsta.dual_infeas_cer,mosek.solsta.near_dual_infeas_cer]: return 'unbounded'
+            #else: return 'other'
             
     def getRHS(self):
         # Returns vector of right-hand-sides (ONLY WORKS FOR MOSEK)
@@ -175,7 +182,7 @@ class model():
             eigs, V = la.eigh(self.getSig(rsp)-self.getSig(~rsp))
             pos = (eigs>0)
             Sig, U = la.eigh(V[:,pos].dot(np.diag(eigs[pos])).dot(V[:,pos].T)-V[:,~pos].dot(np.diag(-eigs[~pos])).dot(V[:,~pos].T))
-            self.m = mosSVMSDP(self.m.dat.dot(U),mrsp,self.getZCon(rsp).dot(U),Sig,U,d=d,mu=mu,lam=self.lam,dual=dualize)
+            self.m = mosSVM(self.m.dat.dot(U),mrsp,self.getZCon(rsp).dot(U),Sig,U,d=d,mu=mu,lam=self.lam,dual=dualize)
     
     def addQuadConstrOld(self, rsp, mu=1, B0=None, dualize=True):
         # Handles the addition of a single covariance constraint (ONLY FOR MOSEK) (Deprecated)
