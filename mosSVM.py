@@ -18,6 +18,7 @@ def streamprinter(text):
 class mosSVM():
     
     def __init__(self, rsp, dat, lam=1, conic=True, dual=False, K=None, Y=None, presolveTol=1.0e-30, outputFlag=False):
+        inf = 0.0
         numPnt = dat.shape[0]
         self.K = K
         self.Y = Y
@@ -82,7 +83,7 @@ class mosSVM():
                     if self.conic:
                         # t>=0, z==1
                         task.appendvars(2)
-                        task.putvarbound(task.getnumvar()-2,mosek.boundkey.up,0.0,math.inf)
+                        task.putvarbound(task.getnumvar()-2,mosek.boundkey.up,0.0,+inf)
                         task.putvarbound(task.getnumvar()-1,mosek.boundkey.fx,1.,1.)
                         # t*z>=sumsqr(B), obj coeff of t == 1
                         task.appendcone(mosek.conetype.rquad,0.0,[task.getnumvar()-2,task.getnumvar()-1]+list(range(self.numFields)))
@@ -139,7 +140,7 @@ class mosSVM():
                         task.putqobj(qsubi.flatten()[idx],qsubj.flatten()[idx],qval.flatten()[idx])
                 
                 task.putobjsense(mosek.objsense.minimize)
-                self.m = task
+                self.m = mosek.Task(task)
                 
     def optimize(self) -> None:
         runTime = time.time()

@@ -88,7 +88,7 @@ class mosPCAMult():
                     self.symmats.append(('X<=ICon%s_%s_%s'%(0,i,j),1))
                     self.symmats.append(('X<=ICon%s_%s_%s'%(1,i,j),1))
                 task.putobjsense(mosek.objsense.minimize)
-                self.m = task
+                self.m = mosek.Task(task)
                 
     def optimize(self) -> None:
         runTime = time.time()
