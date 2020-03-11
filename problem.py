@@ -640,6 +640,7 @@ def crossVal(prob, k=1, kernels=['Linear','Gaussian'], numPC=2, KSError=False, d
     varExpList = np.empty(k)
     totVarList = np.empty(k)
     eigList = [[]]*k
+    eigVecList = [[]]*k
     corrList = [[]]*k
     #train_test = np.array([train_test_split((idx),test_size=0.3) for i in range(k)])
     #trainFolds, testFolds = [list(train_test[:,0]),list(train_test[:,1])]
@@ -666,6 +667,7 @@ def crossVal(prob, k=1, kernels=['Linear','Gaussian'], numPC=2, KSError=False, d
         varExpList[iteration] = varExp
         totVarList[iteration] = totVar
         eigList[iteration] = eig
+        eigVecList[iteration] = eigVecs
         corrList[iteration] = corr
     
         if outputFlag: print(m.m.m.getprosta(mosek.soltype.itr))
@@ -703,7 +705,7 @@ def crossVal(prob, k=1, kernels=['Linear','Gaussian'], numPC=2, KSError=False, d
         # winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
     prob.data = dat
     prob.sideResp = srsp
-    return errList, varExpList, totVarList, eigList, corrList
+    return errList, varExpList, totVarList, eigList, eigVecList, corrList
 
 def multiDimCDF(data,rsp) -> np.ndarray:
     # Given 2-D data, calculates proportion of data with x-coordinate greater than x and
@@ -831,9 +833,10 @@ def runAllDatasets() -> None:
         k=5
         lams = np.logspace(-4,4,5)
         #print('#################### ',prob.filename,' ######################')
-        err, varExp, totVar, eig, corr = crossVal(prob, k, normPCA=True, linCon=False, covCon=False, lams=lams,outputFlag=True)
-        err1, varExp1, totVar1, eig1, corr1 = crossVal(prob, k, normPCA=True, d=0, covCon=False, lams=lams,outputFlag=True)
-        err2, varExp2, totVar2, eig2, corr2 = crossVal(prob, k, mu=0.01, dualize=True, normPCA=True, d=0, lams=lams, outputFlag=True)
+        err, varExp, totVar, eig, eigVec, corr = crossVal(prob, k, normPCA=True, linCon=False, covCon=False, lams=lams,outputFlag=True)
+        print(eigVec)
+        err1, varExp1, totVar1, eig1, eigVec1, corr1 = crossVal(prob, k, normPCA=True, d=0, covCon=False, lams=lams,outputFlag=True)
+        err2, varExp2, totVar2, eig2, eigVec2, corr2 = crossVal(prob, k, mu=0.01, dualize=True, normPCA=True, d=0, lams=lams, outputFlag=True)
         #stuff = [err,err1,err2,varExp,varExp1,varExp2,totVar,totVar1,totVar2,eig,eig1,eig2,corr,corr1,corr2]
         #print('perc variance: %s\nperc deviation: %s\nerrors: %s'%\
         #      (round(100*np.mean(varExp/totVar),2),round(100*np.mean(np.sqrt(varExp/totVar)),2),np.round(np.mean(err),2)))
@@ -879,7 +882,7 @@ if __name__ == '__main__':
     global datasets
     datasets = [#('Adult_Income_Data.csv','Adult Income'),     # 0 32561 \cite{Lichman:2013}
                 #('Biodeg_Data.csv','Biodeg'),                  # 1 1055 \cite{mansouri2013quantitative}
-                ('Ecoli_Data.csv','E. Coli')#,                  # 2 333 \cite{horton1996probabilistic}
+                #('Ecoli_Data.csv','E. Coli'),                  # 2 333 \cite{horton1996probabilistic}
                 #('Energy_Data.csv','Energy'),                  # 3 768 \cite{tsanas2012accurate}
                 #('German_Credit_Data.csv','German Credit'),    # 4 1000 \cite{Lichman:2013}
                 #('Image_Seg_Data.csv','Image'),                # 5 660 \cite{Lichman:2013}
@@ -893,6 +896,7 @@ if __name__ == '__main__':
                 #('Steel_Data.csv','Steel'),                    # 13 1941 \cite{Lichman:2013}
                 #('Taiwanese_Credit_Data.csv','Taiwan Credit'), # 14 29623 \cite{yeh2009comparisons}
                 #('Wine_Quality_Data.csv','Wine Quality')       # 15 6497 \cite{cortez2009modeling}
+                ('/mnt/c/Users/soleu/Dev/Capstone/2020-capstone-privacy/train_1000.csv','train')
                 ]      
     
     runAllDatasets()
